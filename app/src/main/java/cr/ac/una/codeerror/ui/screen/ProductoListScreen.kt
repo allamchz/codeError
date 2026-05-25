@@ -22,6 +22,7 @@ import cr.ac.una.codeerror.data.Producto
 import cr.ac.una.codeerror.viewmodel.ProductoViewModel
 
 @Composable
+
 fun ProductoListScreen(viewModel: ProductoViewModel) {
 
     val context = LocalContext.current
