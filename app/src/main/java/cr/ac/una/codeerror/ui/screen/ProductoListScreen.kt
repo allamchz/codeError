@@ -34,8 +34,8 @@ fun ProductoListScreen(viewModel: ProductoViewModel) {
 
     val categorias = listOf("Todos", "Electrónica", "Ropa", "Hogar", "Deportes", "Alimentos")
 
-    //  BUG 8: Cálculo costoso ejecutado en cada recomposición
-    // Cada vez que cambia cualquier estado, esto se recalcula
+    //  BUG 8: ¿qué pasa calculando las estadísticas así?
+
     val estadisticas = calcularEstadisticas(productos)  //  sin remember ni derivedStateOf
 
     //  CORRECCIÓN sería:
@@ -47,8 +47,8 @@ fun ProductoListScreen(viewModel: ProductoViewModel) {
         productosFiltrados
     }
 
-    //  BUG 9: Filtrado por búsqueda en la UI en cada recomposición
-    // Debería hacerse en el ViewModel o con derivedStateOf
+    //  BUG 9: ¿La búsqueda se hace en cada recomposición?
+
     val listaFinal = if (busqueda.isEmpty()) {
         listaActual
     } else {
@@ -92,11 +92,6 @@ fun ProductoListScreen(viewModel: ProductoViewModel) {
                 )
             }
         }
-
-       // Spacer(modifier = Modifier.height(4.dp))
-
-
-
         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
             if (isLoading) {
                 CircularProgressIndicator()
@@ -107,13 +102,15 @@ fun ProductoListScreen(viewModel: ProductoViewModel) {
                 ) {
                     items(
                         items = listaFinal,
-                        //  key ayuda a Compose a reutilizar items correctamente
+
                         key = { it.id }
                     ) { producto ->
-                        //  BUG 11: Lambda sin estabilidad — causa recomposición de TODAS las tarjetas
-                        // cuando cambia cualquier elemento de la lista
+
+
                         ProductoCard(
                             producto = producto,
+                            //  BUG 11:
+                            // ¿Qué crees que pasa?
                             onClick =  { /* navegar */ }
                             //  CORRECCIÓN: onClick = remember(producto.id) { { /* navegar */ } }
                         )
@@ -124,7 +121,7 @@ fun ProductoListScreen(viewModel: ProductoViewModel) {
     }
 }
 
-//  BUG 8 — función costosa sin caché
+//  BUG 8 — ¿es bueno tener eso sin caché?
 fun calcularEstadisticas(productos: List<Producto>): Map<String, Any> {
     // Simula un cálculo costoso
     Thread.sleep(0) // En producción real podría ser más costoso
@@ -166,9 +163,7 @@ fun EstadisticasCard(estadisticas: Map<String, Any>) {
 
 @Composable
 fun ProductoCard(producto: Producto, onClick: () -> Unit) {
-    //  BUG 11: SideEffect confirma cuántas veces se recompone este composable.
-    // Al cambiar de categoría, aparece en Logcat para TODOS los cards visibles.
-    // Filtrar Logcat por "Recomposicion" para verlo.
+
     SideEffect {
         Log.d("Recomposicion", "ProductoCard recompuesto: ${producto.nombre}")
     }
@@ -203,8 +198,7 @@ fun ProductoCard(producto: Producto, onClick: () -> Unit) {
                 maxLines = 2
             )
             Spacer(modifier = Modifier.height(4.dp))
-            //  BUG 12: Color calculado en cada recomposición con new Color()
-            //  CORRECCIÓN: definir colores como constantes fuera del composable
+            //  BUG 12: ¿qué pasa con el color?
             Box(
                 modifier = Modifier
                     .background(

@@ -12,8 +12,8 @@ interface ProductoDao {
     @Query("SELECT * FROM productos ORDER BY nombre ASC")
     fun getAll(): Flow<List<Producto>>
 
-    //  BUG 1: Consulta sin filtro eficiente — trae TODO y filtra en memoria
-    // Debería ser: SELECT * FROM productos WHERE categoria = :categoria
+    //  BUG 1:
+    // ¿qué hay de malo en la consulta?
     @Query("SELECT * FROM productos")
     suspend fun getAllParaFiltrar(): List<Producto>
 

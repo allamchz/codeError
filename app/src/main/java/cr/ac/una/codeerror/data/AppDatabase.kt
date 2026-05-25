@@ -25,6 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
                 ).also { builder ->
 
                         builder.setQueryCallback(
+                            //¿es bueno manejar el log así?
                             { sql, args -> Log.d("RoomQuery", "SQL: $sql | Args: $args") },
                             Executors.newSingleThreadExecutor()
                         )
